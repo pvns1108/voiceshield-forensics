@@ -1,0 +1,110 @@
+@import "tailwindcss";
+
+:root {
+  --void: #05070c;
+  --panel: #0a0f1a;
+  --panel-raised: #0e1526;
+  --border-hairline: #1c2534;
+  --border-hairline-bright: #2a3548;
+
+  --cyan: #22d3ee;
+  --cyan-dim: #0e7490;
+  --violet: #a78bfa;
+  --emerald: #34d399;
+  --amber: #fbbf24;
+  --red: #f87171;
+
+  --ink: #e2e8f0;
+  --ink-dim: #94a3b8;
+  --ink-faint: #526078;
+}
+
+@theme inline {
+  --color-void: var(--void);
+  --color-panel: var(--panel);
+  --color-panel-raised: var(--panel-raised);
+  --color-hairline: var(--border-hairline);
+  --color-hairline-bright: var(--border-hairline-bright);
+
+  --color-cyan: var(--cyan);
+  --color-cyan-dim: var(--cyan-dim);
+  --color-violet: var(--violet);
+  --color-emerald: var(--emerald);
+  --color-amber: var(--amber);
+  --color-red: var(--red);
+
+  --color-ink: var(--ink);
+  --color-ink-dim: var(--ink-dim);
+  --color-ink-faint: var(--ink-faint);
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+:root {
+  /* Self-hosted fonts aren't reachable from this build's network, so we
+     use carefully chosen system font stacks instead of next/font/google.
+     Swap these for next/font/google (Space Grotesk / Inter / JetBrains
+     Mono) once deployed somewhere with access to fonts.googleapis.com. */
+  --font-display: ui-sans-serif, "Segoe UI Semibold", system-ui, sans-serif;
+  --font-body: ui-sans-serif, "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", "Consolas", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--void);
+  color: var(--ink);
+  font-family: var(--font-body), system-ui, sans-serif;
+  background-image:
+    linear-gradient(rgba(34, 211, 238, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+  background-position: -1px -1px;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display), sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.font-data {
+  font-family: var(--font-mono), monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus ring — always visible for keyboard users */
+:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+/* Scrollbar, subtle */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--void); }
+::-webkit-scrollbar-thumb { background: var(--border-hairline-bright); border-radius: 0; }
+
+@keyframes scan-sweep {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.scan-sweep {
+  animation: scan-sweep 2.2s linear infinite;
+}
