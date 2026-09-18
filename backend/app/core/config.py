@@ -29,8 +29,10 @@ class Settings(BaseSettings):
 
     # CORS
     cors_allow_origins: tuple[str, ...] = (
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://voiceshield-forensics.vercel.app",
+)
     )
 
 
