@@ -1,110 +1,225 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
 
-:root {
-  --void: #05070c;
-  --panel: #0a0f1a;
-  --panel-raised: #0e1526;
-  --border-hairline: #1c2534;
-  --border-hairline-bright: #2a3548;
+/* ==========================================================================
+   VoiceShield Global Styles — "the listening room"
+   ========================================================================== */
 
-  --cyan: #22d3ee;
-  --cyan-dim: #0e7490;
-  --violet: #a78bfa;
-  --emerald: #34d399;
-  --amber: #fbbf24;
-  --red: #f87171;
-
-  --ink: #e2e8f0;
-  --ink-dim: #94a3b8;
-  --ink-faint: #526078;
-}
-
+/* Tailwind v4 theme bridge */
 @theme inline {
-  --color-void: var(--void);
-  --color-panel: var(--panel);
-  --color-panel-raised: var(--panel-raised);
-  --color-hairline: var(--border-hairline);
-  --color-hairline-bright: var(--border-hairline-bright);
+  --color-ground:       var(--c-ground);
+  --color-surface:      var(--c-surface);
+  --color-lift:         var(--c-lift);
+  --color-rule:         var(--c-rule);
+  --color-rule-hi:      var(--c-rule-hi);
+  --color-amber:        var(--c-amber);
+  --color-amber-lo:     var(--c-amber-lo);
+  --color-bone:         var(--c-bone);
+  --color-dim:          var(--c-dim);
+  --color-faint:        var(--c-faint);
+  --color-human:        var(--c-human);
+  --color-synth:        var(--c-synth);
+  --color-inconc:       var(--c-inconc);
+  --color-unavail:      var(--c-unavail);
 
-  --color-cyan: var(--cyan);
-  --color-cyan-dim: var(--cyan-dim);
-  --color-violet: var(--violet);
-  --color-emerald: var(--emerald);
-  --color-amber: var(--amber);
-  --color-red: var(--red);
-
-  --color-ink: var(--ink);
-  --color-ink-dim: var(--ink-dim);
-  --color-ink-faint: var(--ink-faint);
+  /* Legacy aliases — keep existing components working */
+  --color-void:             var(--c-ground);
+  --color-panel:            var(--c-surface);
+  --color-panel-raised:     var(--c-lift);
+  --color-hairline:         var(--c-rule);
+  --color-hairline-bright:  var(--c-rule-hi);
+  --color-ink:              var(--c-bone);
+  --color-ink-dim:          var(--c-dim);
+  --color-ink-faint:        var(--c-faint);
+  /* reroute "cyan" -> amber during migration so old classes still compile */
+  --color-cyan:             var(--c-amber);
+  --color-cyan-dim:         var(--c-amber-lo);
+  --color-emerald:          var(--c-human);
+  --color-red:              var(--c-synth);
+  --color-violet:           #7a6c58;   /* muted warm for pitch chart */
 
   --font-display: var(--font-display);
-  --font-body: var(--font-body);
-  --font-mono: var(--font-mono);
+  --font-body:    var(--font-body);
+  --font-mono:    var(--font-mono);
 }
 
-:root {
-  /* Self-hosted fonts aren't reachable from this build's network, so we
-     use carefully chosen system font stacks instead of next/font/google.
-     Swap these for next/font/google (Space Grotesk / Inter / JetBrains
-     Mono) once deployed somewhere with access to fonts.googleapis.com. */
-  --font-display: ui-sans-serif, "Segoe UI Semibold", system-ui, sans-serif;
-  --font-body: ui-sans-serif, "Segoe UI", system-ui, -apple-system, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Code", "SF Mono", "Consolas", monospace;
-}
-
-* {
-  box-sizing: border-box;
-}
+/* ---- Base reset ---- */
+*, *::before, *::after { box-sizing: border-box; }
 
 html {
   color-scheme: dark;
+  scroll-behavior: smooth;
 }
 
 body {
-  background-color: var(--void);
-  color: var(--ink);
-  font-family: var(--font-body), system-ui, sans-serif;
-  background-image:
-    linear-gradient(rgba(34, 211, 238, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(34, 211, 238, 0.035) 1px, transparent 1px);
-  background-size: 42px 42px;
-  background-position: -1px -1px;
+  background-color: var(--c-ground);
+  color: var(--c-bone);
+  font-family: var(--font-body);
+  font-size: var(--t-body);
+  line-height: var(--lh-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Subtle vignette */
+  background-image: radial-gradient(
+    ellipse 120% 80% at 50% 0%,
+    transparent 40%,
+    rgba(0,0,0,0.55) 100%
+  );
+  background-attachment: fixed;
 }
 
-h1, h2, h3, h4 {
-  font-family: var(--font-display), sans-serif;
-  letter-spacing: -0.01em;
+/* ---- Typography ---- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  line-height: var(--lh-tight);
+  font-weight: 400;   /* DM Serif Display is regular weight */
+}
+h1 { font-size: var(--t-h1); letter-spacing: var(--ls-h1); }
+h2 { font-size: var(--t-h2); letter-spacing: -0.01em; }
+
+.font-display { font-family: var(--font-display); }
+.font-body    { font-family: var(--font-body); }
+.font-mono, .font-data { font-family: var(--font-mono); }
+
+/* Eyebrow / label style */
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--t-micro);
+  letter-spacing: var(--ls-label);
+  text-transform: uppercase;
+  color: var(--c-faint);
 }
 
-.font-data {
-  font-family: var(--font-mono), monospace;
+/* ---- Focus ---- */
+:focus-visible {
+  outline: 1.5px solid var(--c-amber);
+  outline-offset: 3px;
 }
 
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--c-ground); }
+::-webkit-scrollbar-thumb { background: var(--c-rule-hi); border-radius: 0; }
+::-webkit-scrollbar-thumb:hover { background: var(--c-faint); }
+
+/* ---- Film grain overlay ---- */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+/* ---- Registration marks (decorative corner brackets) ---- */
+.reg-mark { position: relative; }
+.reg-mark::before,
+.reg-mark::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-color: var(--c-rule-hi);
+  border-style: solid;
+  pointer-events: none;
+}
+.reg-mark::before { top: 0; left: 0; border-width: 1px 0 0 1px; }
+.reg-mark::after  { bottom: 0; right: 0; border-width: 0 1px 1px 0; }
+
+/* ---- Reveal animation (IntersectionObserver driven) ---- */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+}
+.reveal.visible { opacity: 1; transform: none; }
+
+/* ---- Waveform draw animation ---- */
+@keyframes wave-draw {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+.wave-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  vector-effect: non-scaling-stroke;
+  animation: wave-draw var(--dur-cinematic) var(--ease-out) forwards;
+}
+
+/* ---- Processing readout ---- */
+@keyframes readout-in {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: none; }
+}
+.readout-step {
+  animation: readout-in var(--dur-mid) var(--ease-out) both;
+}
+
+/* ---- Spectrogram fade ---- */
+@keyframes spec-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.spec-reveal {
+  animation: spec-fade var(--dur-slow) var(--ease-out) var(--dur-mid) both;
+}
+
+/* ---- Scan line (decorative, aria-hidden) ---- */
+@keyframes scan-sweep {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+.scan-sweep { animation: scan-sweep 3.5s linear infinite; }
+
+/* ---- Page transition ---- */
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+.page-enter { animation: page-in var(--dur-mid) var(--ease-out) both; }
+
+/* ---- Hero headline reveal (line by line) ---- */
+@keyframes line-reveal {
+  from { opacity: 0; clip-path: inset(0 0 100% 0); }
+  to   { opacity: 1; clip-path: inset(0 0 0% 0); }
+}
+.hero-line { animation: line-reveal var(--dur-slow) var(--ease-out) both; }
+.hero-line:nth-child(1) { animation-delay: 0ms; }
+.hero-line:nth-child(2) { animation-delay: 180ms; }
+.hero-line:nth-child(3) { animation-delay: 320ms; }
+.hero-line:nth-child(4) { animation-delay: 440ms; }
+
+/* ---- Ambient pulse (decorative, aria-hidden) ---- */
+@keyframes ambient-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.65; }
+}
+
+/* ---- Reduced motion: kill everything ---- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
+  .reveal { opacity: 1; transform: none; }
+  .hero-line { opacity: 1; clip-path: none; }
+  .wave-draw { stroke-dashoffset: 0; }
 }
 
-/* Focus ring — always visible for keyboard users */
-:focus-visible {
-  outline: 2px solid var(--cyan);
-  outline-offset: 2px;
-}
+/* ---- Selection ---- */
+::selection { background-color: var(--c-amber-lo); color: var(--c-bone); }
 
-/* Scrollbar, subtle */
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: var(--void); }
-::-webkit-scrollbar-thumb { background: var(--border-hairline-bright); border-radius: 0; }
+/* ---- Utilities ---- */
+.hr { border: none; border-top: 1px solid var(--c-rule); margin: 0; }
+.accent { color: var(--c-amber); }
 
-@keyframes scan-sweep {
-  0% { transform: translateY(-100%); }
-  100% { transform: translateY(100%); }
-}
-
-.scan-sweep {
-  animation: scan-sweep 2.2s linear infinite;
-}
+/* Range input accent */
+input[type="range"] { accent-color: var(--c-amber); }

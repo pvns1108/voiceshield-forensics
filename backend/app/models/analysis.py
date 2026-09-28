@@ -53,6 +53,8 @@ class Analysis(Base):
     features: Mapped[dict] = mapped_column(JSON, default=dict)
     forensic_indicators: Mapped[dict] = mapped_column(JSON, default=dict)
     anti_spoof_model: Mapped[dict] = mapped_column(JSON, default=dict)
+    transcription: Mapped[dict] = mapped_column(JSON, default=dict)
+    transcript_analysis: Mapped[dict] = mapped_column(JSON, default=dict)
 
     # Case management
     case_label: Mapped[str] = mapped_column(String(256), default="")

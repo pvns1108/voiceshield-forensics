@@ -33,7 +33,7 @@ export function AudioPlayer({ src, currentTime, onTimeUpdate, seekTo }: Props) {
   }
 
   return (
-    <div className="border border-hairline p-4 flex flex-col gap-3">
+    <div className="border border-[var(--c-rule)] bg-[var(--c-surface)] p-4 flex flex-col gap-3">
       <audio
         ref={audioRef}
         src={src}
@@ -47,15 +47,15 @@ export function AudioPlayer({ src, currentTime, onTimeUpdate, seekTo }: Props) {
           type="button"
           onClick={togglePlay}
           aria-label={playing ? "Pause" : "Play"}
-          className="w-9 h-9 flex items-center justify-center border border-hairline-bright hover:border-cyan/60 transition-colors shrink-0"
+          className="w-9 h-9 flex items-center justify-center border border-[var(--c-rule-hi)] hover:border-[var(--c-amber)] text-[var(--c-bone)] hover:text-[var(--c-amber)] transition-colors shrink-0 bg-[var(--c-ground)] cursor-pointer"
         >
           {playing ? <PauseIcon /> : <PlayIcon />}
         </button>
-        <div className="text-xs font-data text-ink-faint w-24 shrink-0">
+        <div className="text-xs font-[var(--font-mono)] text-[var(--c-dim)] w-24 shrink-0">
           {formatTime(currentTime)} / {formatTime(duration)}
         </div>
         <div className="flex items-center gap-2 ml-auto">
-          <label htmlFor="rate" className="text-xs text-ink-faint">Speed</label>
+          <label htmlFor="rate" className="text-xs text-[var(--c-dim)] font-[var(--font-mono)]">Speed</label>
           <select
             id="rate"
             value={rate}
@@ -64,13 +64,13 @@ export function AudioPlayer({ src, currentTime, onTimeUpdate, seekTo }: Props) {
               setRate(r);
               if (audioRef.current) audioRef.current.playbackRate = r;
             }}
-            className="bg-panel border border-hairline text-xs text-ink px-1.5 py-1"
+            className="bg-[var(--c-ground)] border border-[var(--c-rule)] text-xs text-[var(--c-bone)] px-2 py-1 font-[var(--font-mono)]"
           >
             {[0.5, 0.75, 1, 1.25, 1.5].map((r) => (
               <option key={r} value={r}>{r}x</option>
             ))}
           </select>
-          <label htmlFor="volume" className="text-xs text-ink-faint ml-2">Vol</label>
+          <label htmlFor="volume" className="text-xs text-[var(--c-dim)] font-[var(--font-mono)] ml-2">Vol</label>
           <input
             id="volume"
             type="range"
@@ -83,7 +83,7 @@ export function AudioPlayer({ src, currentTime, onTimeUpdate, seekTo }: Props) {
               setVolume(v);
               if (audioRef.current) audioRef.current.volume = v;
             }}
-            className="w-20 accent-cyan"
+            className="w-20 accent-[var(--c-amber)] cursor-pointer"
           />
         </div>
       </div>

@@ -132,6 +132,10 @@ class AntiSpoofModel:
     def predict(self, waveform_16k_mono: np.ndarray) -> AntiSpoofResult:
         """Run real inference on a 16kHz mono waveform (float32, [-1, 1]).
 
+        Calibrates the input amplitude to ASVspoof 2019 nominal operating level
+        to prevent BatchNorm saturation in AASIST, and evaluates sliding windows
+        across longer utterances.
+
         Raises ModelUnavailableError if the model could not be loaded —
         callers must not catch this to fabricate a result.
         """
@@ -140,15 +144,19 @@ class AntiSpoofModel:
                 self._unavailable_reason or "Model not loaded."
             )
 
+        windows = _prepare_windows(waveform_16k_mono, MODEL_INPUT_SAMPLES)
         torch = self._torch
-        x = _pad_or_tile(waveform_16k_mono, MODEL_INPUT_SAMPLES)
-        x_tensor = torch.from_numpy(x).float().unsqueeze(0)  # (1, samples)
 
-        with torch.no_grad():
-            _, logits = self._model(x_tensor)
-            probs = torch.softmax(logits, dim=-1).cpu().numpy()[0]
+        all_probs = []
+        for win in windows:
+            x_tensor = torch.from_numpy(win).float().unsqueeze(0)  # (1, samples)
+            with torch.no_grad():
+                _, logits = self._model(x_tensor)
+                probs = torch.softmax(logits, dim=-1).cpu().numpy()[0]
+                all_probs.append(probs)
 
-        spoof_p, bonafide_p = float(probs[0]), float(probs[1])
+        avg_probs = np.mean(all_probs, axis=0)
+        spoof_p, bonafide_p = float(avg_probs[0]), float(avg_probs[1])
         label = "bonafide" if bonafide_p >= DECISION_THRESHOLD else "spoof"
 
         return AntiSpoofResult(
@@ -167,6 +175,51 @@ class AntiSpoofModel:
         return cls._instance
 
 
+def _prepare_windows(
+    waveform_16k_mono: np.ndarray, target_len: int = MODEL_INPUT_SAMPLES
+) -> list[np.ndarray]:
+    """Prepare 64,600-sample (~4.04s) analysis windows for AASIST inference.
+
+    1. Normalizes waveform amplitude to the ASVspoof 2019 nominal operating headroom
+       (target peak ~0.10, corresponding to ~ -20 dBFS studio recording level).
+       AASIST's SincConv front-end and first BatchNorm layer were trained on VCTK
+       audio with studio headroom; modern mobile and lossy-compressed recordings
+       near full scale (peak ~1.0) saturate the trained BatchNorm running statistics,
+       driving the network to falsely classify genuine human speech as spoof.
+    2. For utterances shorter than target_len, tiles the waveform to target_len.
+    3. For utterances longer than target_len, extracts sliding windows with 50%
+       overlap (skipping purely silent windows).
+    """
+    x = np.asarray(waveform_16k_mono, dtype=np.float32).flatten()
+    if len(x) == 0:
+        return [np.zeros(target_len, dtype=np.float32)]
+
+    # Headroom calibration: scale to ASVspoof nominal operating point if louder
+    peak = float(np.max(np.abs(x)))
+    if peak > 0:
+        target_peak = 0.10
+        if peak > target_peak:
+            x = x * (target_peak / peak)
+
+    if len(x) <= target_len:
+        num_repeats = int(target_len / len(x)) + 1
+        return [np.tile(x, num_repeats)[:target_len]]
+
+    # Multi-window extraction for longer audio (50% overlap hop)
+    hop = target_len // 2
+    windows = []
+    for start in range(0, len(x) - target_len + 1, hop):
+        window = x[start:start + target_len]
+        # Ignore windows that are virtually pure silence
+        if np.sqrt(np.mean(window**2)) > 0.002:
+            windows.append(window)
+
+    if not windows:
+        windows = [x[:target_len]]
+
+    return windows
+
+
 def _pad_or_tile(x: np.ndarray, target_len: int) -> np.ndarray:
     """Mirrors the source repo's own `data_utils.py: pad()` behaviour."""
     x = np.asarray(x, dtype=np.float32).flatten()
@@ -174,6 +227,7 @@ def _pad_or_tile(x: np.ndarray, target_len: int) -> np.ndarray:
         return x[:target_len]
     num_repeats = int(target_len / x.shape[0]) + 1
     return np.tile(x, num_repeats)[:target_len]
+
 
 
 def checkpoint_sha256() -> str:

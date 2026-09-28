@@ -18,6 +18,9 @@ router = APIRouter(prefix="/api/v1/model-info", tags=["model-info"])
 @router.get("")
 def model_info():
     model = AntiSpoofModel.get()
+    from app.services.asr import ASRService
+    asr_svc = ASRService.get()
+
     return {
         "model_name": MODEL_NAME,
         "source_repository": MODEL_SOURCE,
@@ -55,4 +58,12 @@ def model_info():
             "A single model score is never a substitute for human "
             "review in any high-impact decision.",
         ],
+        "asr_model": asr_svc.get_info(),
     }
+
+
+@router.get("/asr")
+def asr_model_info():
+    from app.services.asr import ASRService
+    return ASRService.get().get_info()
+

@@ -72,12 +72,60 @@ export type Assessment =
   | "unavailable"
   | "";
 
+export interface WordSegment {
+  word: string;
+  start: number;
+  end: number;
+  probability?: number | null;
+}
+
+export interface TranscriptSegment {
+  id: number;
+  start: number;
+  end: number;
+  text: string;
+  words: WordSegment[];
+}
+
+export interface TranscriptionResult {
+  status: "ok" | "unavailable" | "failed";
+  text: string;
+  language: string;
+  language_probability?: number | null;
+  model_name?: string;
+  processing_time_ms?: number;
+  segments: TranscriptSegment[];
+  words: WordSegment[];
+  reason?: string | null;
+  error?: string | null;
+}
+
+export interface TranscriptIndicator {
+  category: string;
+  matched_text: string;
+  severity: "high" | "medium" | "low";
+  note: string;
+}
+
+export interface TranscriptAnalysisResult {
+  indicators: TranscriptIndicator[];
+  summary: string;
+  total_indicators: number;
+  high_severity_count: number;
+  medium_severity_count: number;
+  low_severity_count: number;
+  has_suspicious_content: boolean;
+  disclaimer?: string;
+}
+
 export type AnalysisStatus =
   | "queued"
   | "validating"
   | "preprocessing"
   | "extracting_features"
   | "hashing_normalized_audio"
+  | "transcription"
+  | "transcript_analysis"
   | "model_inference"
   | "generating_report"
   | "complete"
@@ -116,6 +164,8 @@ export interface AnalysisDetail {
   features: Features;
   forensic_indicators: ForensicIndicators;
   anti_spoof_model: AntiSpoofModelResult;
+  transcription?: TranscriptionResult;
+  transcript_analysis?: TranscriptAnalysisResult;
 
   case_label: string;
   notes: string;

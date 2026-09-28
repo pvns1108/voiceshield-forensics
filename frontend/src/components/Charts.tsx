@@ -46,10 +46,10 @@ export function PitchChart({ pitch, height = 140 }: PitchProps) {
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full" preserveAspectRatio="none" role="img" aria-label="Pitch contour over time">
       {[0.25, 0.5, 0.75].map((f) => (
-        <line key={f} x1={0} y1={height * f} x2={width} y2={height * f} stroke="var(--border-hairline)" strokeWidth={1} />
+        <line key={f} x1={0} y1={height * f} x2={width} y2={height * f} stroke="var(--c-rule)" strokeWidth={1} />
       ))}
       {segments.map((d, i) => (
-        <path key={i} d={d} fill="none" stroke="var(--violet)" strokeWidth={1.5} />
+        <path key={i} d={d} fill="none" stroke="var(--c-amber)" strokeWidth={1.5} />
       ))}
     </svg>
   );
@@ -81,7 +81,7 @@ export function EnergyChart({ energy, height = 100 }: EnergyProps) {
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full" preserveAspectRatio="none" role="img" aria-label="RMS energy over time">
-      <path d={path} fill="rgba(34,211,238,0.18)" stroke="var(--cyan)" strokeWidth={1} />
+      <path d={path} fill="var(--c-amber-dim)" stroke="var(--c-amber)" strokeWidth={1} />
     </svg>
   );
 }

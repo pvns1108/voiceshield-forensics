@@ -10,7 +10,9 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.ml import features as feature_extraction
 from app.ml.anti_spoof import AntiSpoofModel, ModelUnavailableError
+from app.ml.transcript_analysis import analyze_transcript
 from app.models.analysis import Analysis
+from app.services.asr import ASRService
 from app.services.audio_ingest import UploadValidationError, probe_audio, sha256_of_file
 
 
@@ -129,7 +131,53 @@ def process_analysis(analysis_id: str, db: Session) -> None:
         }
         analysis.forensic_indicators = asdict(result.forensic)
 
-        # 3. Real anti-spoofing model inference (or honest unavailable state)
+        # 3. Automatic Speech Recognition (ASR Branch)
+        def run_asr():
+            asr_svc = ASRService.get()
+            if not asr_svc.is_available():
+                return {
+                    "status": "unavailable",
+                    "reason": asr_svc.unavailable_reason(),
+                    "model_name": asr_svc.model_size,
+                    "text": "",
+                    "language": "unknown",
+                    "segments": [],
+                    "words": [],
+                }
+            try:
+                tx_res = asr_svc.transcribe(result.normalized_waveform_16k_mono)
+                return tx_res.to_dict()
+            except Exception as exc:
+                return {
+                    "status": "failed",
+                    "error": str(exc),
+                    "model_name": asr_svc.model_size,
+                    "text": "",
+                    "language": "unknown",
+                    "segments": [],
+                    "words": [],
+                }
+
+        transcription_result = timer.run("transcription", run_asr)
+        analysis.transcription = transcription_result
+
+        # 4. Transcript-based Scam / Social-Engineering Analysis (Text Branch)
+        def run_transcript_analysis():
+            text = transcription_result.get("text", "") if isinstance(transcription_result, dict) else ""
+            if not text:
+                return {
+                    "indicators": [],
+                    "summary": "No transcript available for text analysis.",
+                    "total_indicators": 0,
+                    "has_suspicious_content": False,
+                }
+            tx_analysis = analyze_transcript(text)
+            return tx_analysis.to_dict()
+
+        transcript_analysis_result = timer.run("transcript_analysis", run_transcript_analysis)
+        analysis.transcript_analysis = transcript_analysis_result
+
+        # 5. Real anti-spoofing model inference (Audio Branch - AASIST)
         def run_model_inference():
             model = AntiSpoofModel.get()
             if not model.is_available():

@@ -1,0 +1,115 @@
+/* ==========================================================================
+   VoiceShield Design Tokens — "the listening room"
+   Single source of truth. Never hard-code these values in components.
+   ========================================================================== */
+
+:root {
+  /* ---- Palette ---- */
+  --c-ground:   #0c0b09;   /* warm near-black background */
+  --c-surface:  #131210;   /* raised surfaces */
+  --c-lift:     #1c1a17;   /* hover / active */
+  --c-rule:     #262420;   /* hairline borders */
+  --c-rule-hi:  #37342e;   /* brighter hairlines */
+
+  --c-amber:    #d4903a;   /* signature phosphor-amber accent */
+  --c-amber-lo: #7a4f18;   /* dim amber fill */
+  --c-amber-dim: rgba(212, 144, 58, 0.12); /* subtle amber wash */
+
+  --c-bone:     #e8e2d5;   /* primary text — warm off-white */
+  --c-dim:      #8c8577;   /* secondary text */
+  --c-faint:    #524e46;   /* tertiary / placeholder */
+
+  /* Status — deliberately desaturated; never used as decoration */
+  --c-human:    #5e8c5e;
+  --c-human-bg: rgba(94, 140, 94, 0.10);
+  --c-synth:    #8c4040;
+  --c-synth-bg: rgba(140, 64, 64, 0.10);
+  --c-inconc:   #8c7040;
+  --c-inconc-bg: rgba(140, 112, 64, 0.10);
+  --c-unavail:  #524e46;
+  --c-unavail-bg: rgba(82, 78, 70, 0.10);
+
+  /* SVG & component compatibility aliases */
+  --border-hairline: var(--c-rule);
+  --hairline:        var(--c-rule);
+  --hairline-bright: var(--c-rule-hi);
+  --cyan:            var(--c-amber);
+  --cyan-dim:        var(--c-amber-lo);
+  --amber:           var(--c-amber);
+  --violet:          #8c7040;
+  --ink:             var(--c-bone);
+  --ink-dim:         var(--c-dim);
+  --ink-faint:       var(--c-faint);
+  --void:            var(--c-ground);
+  --panel:           var(--c-surface);
+
+  /* ---- Typography ---- */
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body:    'DM Sans', system-ui, sans-serif;
+  --font-mono:    'DM Mono', 'Cascadia Code', 'Consolas', monospace;
+
+  --t-hero:   clamp(2.75rem, 7vw, 6.5rem);
+  --t-h1:     clamp(1.625rem, 3.5vw, 2.75rem);
+  --t-h2:     1.1875rem;
+  --t-body:   0.9375rem;
+  --t-small:  0.8125rem;
+  --t-micro:  0.6875rem;
+  --t-data:   0.8125rem;
+
+  --lh-tight:  1.1;
+  --lh-snug:   1.3;
+  --lh-normal: 1.55;
+  --lh-loose:  1.7;
+
+  --ls-hero:   -0.04em;
+  --ls-h1:     -0.025em;
+  --ls-label:   0.12em;
+
+  /* ---- Spacing ---- */
+  --s-1:  4px;
+  --s-2:  8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --s-16: 64px;
+  --s-20: 80px;
+  --s-24: 96px;
+
+  /* ---- Layout ---- */
+  --max-w:       1440px;
+  --gutter:      clamp(24px, 4vw, 64px);
+  --col-gap:     24px;
+  --measure:     68ch;     /* reading line length */
+
+  /* ---- Radii ---- */
+  --r-none: 0;
+  --r-xs:   2px;   /* only for tight interactive elements */
+
+  /* ---- Motion ---- */
+  --ease-out:     cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:      cubic-bezier(0.4, 0, 1, 1);
+  --ease-snappy:  cubic-bezier(0.25, 0, 0, 1);
+
+  --dur-fast:      120ms;
+  --dur-mid:       240ms;
+  --dur-slow:      400ms;
+  --dur-cinematic: 1200ms;
+
+  /* ---- Misc ---- */
+  --grain-opacity: 0.038;
+  --vignette-opacity: 0.55;
+}
+
+/* Reduced motion: collapse all durations */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast:      0.001ms;
+    --dur-mid:       0.001ms;
+    --dur-slow:      0.001ms;
+    --dur-cinematic: 0.001ms;
+  }
+}

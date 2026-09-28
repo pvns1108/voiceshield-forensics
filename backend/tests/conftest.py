@@ -36,6 +36,11 @@ def temp_env(monkeypatch, tmp_path):
     init_db()
     yield app
 
+    try:
+        from app.services.asr import ASRService
+        ASRService.reset()
+    except Exception:
+        pass
     shutil.rmtree(data_dir, ignore_errors=True)
 
 

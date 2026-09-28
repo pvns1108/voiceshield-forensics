@@ -80,10 +80,10 @@ export function WaveformView({
           />
         ))}
 
-      <line x1={0} y1={midY} x2={width} y2={midY} stroke="var(--border-hairline)" strokeWidth={1} />
+      <line x1={0} y1={midY} x2={width} y2={midY} stroke="var(--c-rule)" strokeWidth={1} />
 
-      <path d={path} fill="none" stroke="var(--cyan)" strokeWidth={1.25} opacity={0.9} />
-      <path d={mirrorPath} fill="none" stroke="var(--cyan-dim)" strokeWidth={1} opacity={0.55} />
+      <path d={path} fill="none" stroke="var(--c-amber)" strokeWidth={1.25} opacity={0.9} />
+      <path d={mirrorPath} fill="none" stroke="var(--c-amber-lo)" strokeWidth={1} opacity={0.55} />
 
       {durationSec > 0 && (
         <line
@@ -91,7 +91,7 @@ export function WaveformView({
           y1={0}
           x2={playheadX}
           y2={height}
-          stroke="var(--amber)"
+          stroke="var(--c-bone)"
           strokeWidth={1.5}
         />
       )}

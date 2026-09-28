@@ -27,3 +27,18 @@ def get_db():
 def init_db() -> None:
     from app.models import analysis  # noqa: F401  (ensure models are registered)
     Base.metadata.create_all(bind=engine)
+    if settings.database_url.startswith("sqlite"):
+        with engine.connect() as conn:
+            from sqlalchemy import text
+            try:
+                existing_cols = [
+                    r[1] for r in conn.execute(text("PRAGMA table_info(analyses)")).fetchall()
+                ]
+                if "transcription" not in existing_cols:
+                    conn.execute(text("ALTER TABLE analyses ADD COLUMN transcription JSON DEFAULT '{}'"))
+                if "transcript_analysis" not in existing_cols:
+                    conn.execute(text("ALTER TABLE analyses ADD COLUMN transcript_analysis JSON DEFAULT '{}'"))
+                conn.commit()
+            except Exception:
+                pass
+

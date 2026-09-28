@@ -49,6 +49,8 @@ class AnalysisDetail(BaseModel):
     features: dict[str, Any]
     forensic_indicators: dict[str, Any]
     anti_spoof_model: dict[str, Any]
+    transcription: Optional[dict[str, Any]] = None
+    transcript_analysis: Optional[dict[str, Any]] = None
 
     case_label: str
     notes: str
