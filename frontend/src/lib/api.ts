@@ -5,8 +5,15 @@ import type {
   ModelInfo,
 } from "./types";
 
+const PROD_API_BASE_URL = "https://voiceshield-forensics-prakash.onrender.com";
+
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000";
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  (typeof window !== "undefined"
+    ? (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+        ? "http://localhost:8000"
+        : PROD_API_BASE_URL)
+    : (process.env.NODE_ENV === "production" ? PROD_API_BASE_URL : "http://localhost:8000"));
 
 export class ApiError extends Error {
   status: number;

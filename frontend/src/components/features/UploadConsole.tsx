@@ -99,7 +99,7 @@ export function UploadConsole() {
       setError(
         err instanceof ApiError
           ? err.message
-          : "Upload failed. Verify the backend API is running on port 8000."
+          : (err instanceof Error ? err.message : "Upload failed. Could not reach the forensics backend API.")
       );
     } finally {
       setSubmitting(false);
